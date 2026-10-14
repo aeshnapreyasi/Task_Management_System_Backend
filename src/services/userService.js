@@ -41,14 +41,10 @@ async function loginUser(email, password) {
   if (!user) {
     throw new Error("Invalid credentials.");
   }
-  // console.log(user);
-
   const isMatch = await bcrypt.compare(
     password,
     user.passwordHash
-    
   );
-  // console.log(isMatch);
 
   if (!isMatch) {
     throw new Error("Invalid credentials.");
@@ -57,7 +53,19 @@ async function loginUser(email, password) {
   return user;
 }
 
+async function getUserById(id) {
+  return prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      email: true,
+      createdAt: true,
+    },
+  });
+}
+
 module.exports = {
   registerUser,
   loginUser,
+  getUserById,
 }
