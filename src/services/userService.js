@@ -1,16 +1,16 @@
+
 const bcrypt = require("bcrypt");
 const { PrismaClient } = require("@prisma/client");
 
-const Prisma = new PrismaClient();
+const prisma = new PrismaClient();
 
+// Register user
 async function registerUser(email, password) {
   if (!email || !password) {
     throw new Error("Email and password are required.");
   }
 
-  const passwordHash = await bcrypt.hash(password, 10);
-
-  const existingUser = await Prisma.user.findUnique({
+  const existingUser = await prisma.user.findUnique({
     where: { email },
   });
 
@@ -18,9 +18,46 @@ async function registerUser(email, password) {
     throw new Error("Email is already registered.");
   }
 
-  return Prisma.user.create({
-    data: { email, passwordHash },
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  return prisma.user.create({
+    data: {
+      email,
+      passwordHash,
+    },
   });
 }
 
-module.exports = { registerUser };
+// Login user
+async function loginUser(email, password) {
+  if (!email || !password) {
+    throw new Error("Email and password are required.");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (!user) {
+    throw new Error("Invalid credentials.");
+  }
+  // console.log(user);
+
+  const isMatch = await bcrypt.compare(
+    password,
+    user.passwordHash
+    
+  );
+  // console.log(isMatch);
+
+  if (!isMatch) {
+    throw new Error("Invalid credentials.");
+  }
+
+  return user;
+}
+
+module.exports = {
+  registerUser,
+  loginUser,
+}
