@@ -1,4 +1,3 @@
-
 const jwt = require("jsonwebtoken");
 const {
   registerUser,
@@ -8,15 +7,16 @@ const {
 
 // Register controller
 async function register(req, res) {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
 
   try {
-    const newUser = await registerUser(email, password);
+    const newUser = await registerUser(name, email, password);
 
     return res.status(201).json({
       message: "Registration successful",
       user: {
         id: newUser.id,
+        name: newUser.name,
         email: newUser.email,
       },
     });
@@ -29,7 +29,7 @@ async function register(req, res) {
       });
     }
 
-    if (error.message === "Email and password are required.") {
+    if (error.message === "Name, Email and password are required.") {
       return res.status(400).json({
         message: error.message,
       });
@@ -44,13 +44,17 @@ async function register(req, res) {
 //defining the generatorJWT function
 function generateJWT(user) {
   const secret = process.env.JWT_SECRET;
-  if(!secret) {
+  if (!secret) {
     throw new Error("JWT_SECRET is not configured.");
   }
-  return jwt.sign({userId: user.id}, secret, {expiresIn: "1h"});
+  return jwt.sign(
+    { userId: user.id },
+    secret, 
+    { expiresIn: "1h" });
 }
 
 // Login controller
+
 async function login(req, res) {
   const { email, password } = req.body;
 
@@ -61,31 +65,24 @@ async function login(req, res) {
       throw new Error("JWT_SECRET is not configured.");
     }
 
-    // const token = jwt.sign(
-    //   { userId: user.id },
-    //   process.env.JWT_SECRET,
-    //   { expiresIn: "1h" }
-    // );
     const token = generateJWT(user);
 
-    //seting the cookie configuration
-    res.cookie ('token', token, {
+    res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 3600000 
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 3600000,
     });
-    // return res.status(200).json({
-    //   message: "Login successful",
-    //   token,
-    //   user: {
-    //     id: user.id,
-    //     email: user.email,
-    //   },
-    // });
 
-    return res.status(200).json({success: true, message: 'Logged in successfully'});
-    
+    return res.status(200).json({
+      success: true,
+      message: "Logged in successfully",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
+    });
   } catch (error) {
     console.error("Login error:", error);
 

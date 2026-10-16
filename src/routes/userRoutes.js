@@ -4,6 +4,7 @@ const userController = require("../controllers/userController");
 const authenticateToken = require("../middleware/authenticateToken");
 const { loginLimiter, registerLimiter } = require("../middleware/rateLimiter");
 
+
 // Route for user registration
 router.post("/auth/register", registerLimiter, userController.register);
 router.post("/auth/login", loginLimiter, userController.login);

@@ -1,3 +1,4 @@
+
 const jwt = require("jsonwebtoken");
 
 function authenticateToken(req, res, next) {
@@ -9,11 +10,13 @@ function authenticateToken(req, res, next) {
     });
   }
 
-  // read token from cookie
+  // Read token from cookie
   const token = req.cookies?.token;
 
-  if(!token){
-    return res.status(401).json({message: "Authentication token is required"});
+  if (!token) {
+    return res.status(401).json({
+      message: "Authentication token is required.",
+    });
   }
 
   try {
@@ -22,7 +25,8 @@ function authenticateToken(req, res, next) {
     if (
       typeof payload !== "object" ||
       payload === null ||
-      !Number.isInteger(payload.userId)
+      typeof payload.userId !== "string" ||
+      payload.userId.length === 0
     ) {
       return res.status(401).json({
         message: "Invalid authentication token.",
@@ -30,6 +34,7 @@ function authenticateToken(req, res, next) {
     }
 
     req.userId = payload.userId;
+
     return next();
   } catch {
     return res.status(401).json({

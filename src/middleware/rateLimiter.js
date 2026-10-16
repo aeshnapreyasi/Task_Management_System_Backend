@@ -5,7 +5,7 @@ const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 5,
   message: {
-    error: "Too many login attempts. Please try again after 15 minutes.",
+    error: "Too many login attempts. Please try again after 5 minutes.",
   },
   statusCode: 429,
   standardHeaders: true,
@@ -14,7 +14,7 @@ const loginLimiter = rateLimit({
 
 // Allow up to 3 registration attempts per hour.
 const registerLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000,
+  windowMs: 5 * 60 * 1000,
   limit: 3,
   message: {
     error: "Too many registration attempts. Please try again later.",

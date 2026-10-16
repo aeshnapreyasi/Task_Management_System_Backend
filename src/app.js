@@ -3,7 +3,7 @@ const app = express();
 const userRoutes = require("./routes/index");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-
+const projectRoutes = require("./routes/projectRoutes")
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -15,5 +15,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser())
 app.use("/api", userRoutes);
+app.use("/api/projects", projectRoutes);
+
 
 module.exports = app;
