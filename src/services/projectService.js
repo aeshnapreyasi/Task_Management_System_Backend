@@ -26,7 +26,7 @@ async function createProject(userId, name, description){
   });
 }
 
-//view the projects of a user 
+//view the projects of a user by id
 async function viewProjectById(projectID, userId){
   return prisma.project.findFirst({
     where:{
@@ -45,7 +45,9 @@ async function updateProjectById(projectID, userId, data){
     },
     data: data, 
   });
+  console.log(result);
   return result;
+  
 }
 
 //delete the project of a user using id 
