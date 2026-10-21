@@ -7,10 +7,30 @@ const {
 
 // Register controller
 async function register(req, res) {
-  const { name, email, password } = req.body;
+  const { name, email, password, role, invitationCode } = req.body;
 
   try {
-    const newUser = await registerUser(name, email, password);
+    // first we have to validate the selected role 
+    if(!["MANAGER", "EMPLOYEE"].includes(role)){
+      return res.status(400).json({
+        message: "Please select a valid role!"
+      });
+    }
+
+    // now after this, we have to verify the role specefic fixed code
+    const expectedCode = 
+    role === "MANAGER"
+    ? process.env.MANAGER_SECRET_CODE
+    : process.env.EMPLOYEE_SECRET_CODE;
+
+    if(!invitationCode || invitationCode !== expectedCode) {
+      return res.status(400).json({
+        message: "Invalid invitation code!",
+      });
+    }
+
+    // now passint the role to the registration service
+    const newUser = await registerUser(name, email, password, role);
 
     return res.status(201).json({
       message: "Registration successful",
@@ -18,6 +38,7 @@ async function register(req, res) {
         id: newUser.id,
         name: newUser.name,
         email: newUser.email,
+        role: newUser.role, 
       },
     });
   } catch (error) {
@@ -48,7 +69,9 @@ function generateJWT(user) {
     throw new Error("JWT_SECRET is not configured.");
   }
   return jwt.sign(
-    { userId: user.id },
+    { userId: user.id,
+      Role:user.Role
+     },
     secret, 
     { expiresIn: "1h" });
 }
@@ -81,6 +104,7 @@ async function login(req, res) {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -123,8 +147,22 @@ async function currentUser(req, res) {
   }
 }
 
+// applying log out controller function 
+function logout(req, res) {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: "strict",
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+}
+
 module.exports = {
   register,
   login,
   currentUser,
+  logout,
 };

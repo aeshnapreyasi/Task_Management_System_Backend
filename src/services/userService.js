@@ -4,8 +4,8 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 // Register user
-async function registerUser(name, email, password) {
-  if (!name || !email || !password) {
+async function registerUser(name, email, password, role) {
+  if (!name || !email || !password || !role) {
     throw new Error("Name, Email and password are required.");
   }
 
@@ -24,6 +24,7 @@ async function registerUser(name, email, password) {
       name,
       email,
       passwordHash,
+      role, // this will save manager or employee in db.
     },
   });
 }
@@ -59,6 +60,7 @@ async function getUserById(id) {
       id: true,
       name: true,
       email: true,
+      role: true,
       createdAt: true,
       updatedAt: true,
     },
