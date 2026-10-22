@@ -70,7 +70,7 @@ function generateJWT(user) {
   }
   return jwt.sign(
     { userId: user.id,
-      Role:user.Role
+      role:user.role,
      },
     secret, 
     { expiresIn: "1h" });

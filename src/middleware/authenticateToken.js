@@ -34,6 +34,7 @@ function authenticateToken(req, res, next) {
     }
 
     req.userId = payload.userId;
+    req.userRole = payload.role;
 
     return next();
   } catch {
