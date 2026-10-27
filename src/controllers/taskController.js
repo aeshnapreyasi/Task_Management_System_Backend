@@ -114,7 +114,8 @@ async function getTasksController(req, res) {
     const userRole = req.userRole;
 
     // fetching tasks according to the user's role
-    const tasks = await getTasks(userId, userRole);
+    const projectId = req.query.projectId;
+    const tasks = await getTasks(userId, userRole, projectId); 
 
     //sending the fetched tasks to the client
     return res.status(200).json({

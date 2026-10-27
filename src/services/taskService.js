@@ -33,10 +33,14 @@ async function createTask(projectId, title, description, priority, dueDate) {
 }
 
 //fetching tasks based on the user's role
-async function getTasks(userId, userRole) {
+async function getTasks(userId, userRole, projectId) {
   // manager can see all tasks
   // employee can only see task that is assigned to them
-  const whereCondition = userRole === "MANAGER" ? {} : { userId: userId };
+  const whereCondition = {
+  ...(userRole === "MANAGER" ? {} : { userId: userId }),
+  ...(projectId ? { projectId } : {}),
+  };
+
 
   return prisma.task.findMany({
     where: whereCondition,

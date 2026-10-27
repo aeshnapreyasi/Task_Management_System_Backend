@@ -147,7 +147,9 @@ async function currentUser(req, res) {
   }
 }
 
-// applying log out controller function 
+// applying log out controller function if user have the token
+
+
 function logout(req, res) {
   res.clearCookie("token", {
     httpOnly: true,
